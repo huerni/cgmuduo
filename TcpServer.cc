@@ -48,12 +48,15 @@ void TcpServer::setThreadNum(int numThreads) {
 }
 
 void TcpServer::start() {
+    LOG_INFO(" [%s:%s:%d] TcpServer start! \n", __FILE__, __FUNCTION__, __LINE__);
+
     if(started_++ == 0) {
         threadPool_->start(threadInitCallback_);
         loop_->runInLoop(std::bind(&Acceptor::listen, acceptor_.get()));
     }
 }
 
+// 新客户端到来时，acceptor会执行这个回调操作
 void TcpServer::newConnection(int sockfd, const InetAddress &peerAddr) {
     EventLoop *ioLoop = threadPool_->getNextLoop();
     char buf[64] = {0};
@@ -61,17 +64,18 @@ void TcpServer::newConnection(int sockfd, const InetAddress &peerAddr) {
     ++nextConnId_;
     std::string connName = name_ + buf;
 
-    LOG_INFO("TcpServer::newConnection [%s] - new connection [%s] from %s \n", 
-    name_.c_str(), connName.c_str(), peerAddr.toIpPort().c_str());
+    LOG_INFO("[%s:%s:%d] TcpServer::newConnection [%s] - new connection [%s] from %s \n", 
+    __FILE__, __FUNCTION__, __LINE__, name_.c_str(), connName.c_str(), peerAddr.toIpPort().c_str());
 
     sockaddr_in local;
     ::bzero(&local, sizeof local);
     socklen_t addrlen = sizeof local;
     if(::getsockname(sockfd, (sockaddr*)&local, &addrlen) < 0) {
-        LOG_ERROR("sockets::getLocalAddr");
+        LOG_ERROR("[%s:%s:%d] sockets::getLocalAddr error", __FILE__, __FUNCTION__, __LINE__);
     }
     InetAddress localAddr(local);
 
+    // 根据连接成功的sockfd创建tcpConnection
     TcpConnectionPtr conn(new TcpConnection(
                             ioLoop,
                             connName,

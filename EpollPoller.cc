@@ -1,17 +1,24 @@
 #include "EpollPoller.h"
 #include "Logger.h"
 #include "Channel.h"
+
+#include <errno.h>
 #include <memory.h>
 #include <unistd.h>
 
+// channel未添加到poller中
 const int KNew = -1;
+// channel已添加到poller中
 const int KAdded = 1;
+// channel从poller中删除
 const int KDeleted = 2;
 
 EpollPoller::EpollPoller(EventLoop* loop) 
-    : Poller(loop), epollfd_(::epoll_create1(EPOLL_CLOEXEC)), events_(kInitEventListSize) { 
+    : Poller(loop)
+    , epollfd_(::epoll_create1(EPOLL_CLOEXEC))
+    , events_(kInitEventListSize) { 
         if(epollfd_ < 0) {
-            LOG_FATAL("epoll_create error:%d", errno);
+            LOG_FATAL("epoll_create error:%d \n", errno);
         }
 }
 
@@ -21,17 +28,17 @@ EpollPoller::~EpollPoller(){
 
 // epoll_wait监听events中的事件，并将活跃通道返回给所属的loop
 Timestamp EpollPoller::poll (int timeoutMs, ChannelList *activeChannels) {
-    LOG_INFO("func=%s => fd total count=%d \n", __FUNCTION__, channels_.size());
+    LOG_INFO("[%s:%s:%d] fd total count=%d \n",  __FILE__, __FUNCTION__, __LINE__, channels_.size())
     
     int numEvents = ::epoll_wait(epollfd_, &*events_.begin(), static_cast<int>(events_.size()), timeoutMs);
     int saveErrno = errno;
     Timestamp now(Timestamp::now());
 
     if(numEvents > 0) {
-        LOG_INFO("%d events happened \n", numEvents);
+        LOG_INFO("[%s:%s:%d] %d events happened \n", __FILE__, __FUNCTION__, __LINE__, numEvents);
         fillActiveChannels(numEvents, activeChannels);
         if(numEvents == events_.size()) {
-            events_.resize(numEvents * 2);
+            events_.resize(events_.size() * 2);
         }
     }
     else if(numEvents == 0) {
@@ -49,7 +56,7 @@ Timestamp EpollPoller::poll (int timeoutMs, ChannelList *activeChannels) {
 // 更新channel  如果没在Poller中，则添加，否则有活动，修改，如果没有活动，从Poller监测中移除(EPOLL_CTL_DEL)，但不移除map
 void EpollPoller::updateChannel(Channel* channel) {
     const int index = channel->index();
-    LOG_INFO("func=%s => fd=%d, events=%d, index=%d \n", __FUNCTION__, channel->fd(), channel->events(), channel->index());
+    LOG_INFO("[%s:%s:%d] fd=%d, events=%d, index=%d \n", __FILE__, __FUNCTION__, __LINE__, channel->fd(), channel->events(), channel->index());
     if(index == KNew || index == KDeleted) {
         if(index == KNew) {
             int fd = channel->fd();
@@ -73,21 +80,23 @@ void EpollPoller::updateChannel(Channel* channel) {
 // 从Poller中删除channel，即移除map，如果已被Poller监测，则从Poller中移除(EPOLL_CTL_DEL)
 void EpollPoller::removeChannel(Channel* channel) {
     int fd = channel->fd();
+    channels_.erase(fd);
+
     int index = channel->index();
-    LOG_INFO("func=%s => fd=%d, index=%d \n", __FUNCTION__, channel->fd(), channel->index());
+    LOG_INFO("[%s:%s:%d] fd=%d, index=%d \n", __FILE__, __FUNCTION__, __LINE__, channel->fd(), channel->index());
     if(index == KAdded) {
         update(EPOLL_CTL_DEL, channel);
     }
-    channels_.erase(fd);
     channel->set_index(KNew);
 }
 
 // 填充活跃通道
-void EpollPoller::fillActiveChannels(int numEvents, ChannelList* activeChannels) {
-    LOG_INFO("func=%s => num total count=%d", numEvents);
-    
+void EpollPoller::fillActiveChannels(int numEvents, ChannelList* activeChannels) const {
+    LOG_INFO("[%s:%s:%d] num total count=%d \n", __FILE__, __FUNCTION__, __LINE__, numEvents);
+
     for(int i = 0; i<numEvents; ++i) {
-        Channel* channel = static_cast<Channel*>(events_[i].data.ptr);
+        Channel *channel = static_cast<Channel*>(events_[i].data.ptr);
+        // TODO:fix bug, Program terminated with signal SIGSEGV, Segmentation fault.
         channel->set_revents(events_[i].events);
         activeChannels->push_back(channel);
     }

@@ -4,6 +4,9 @@
 
 class InetAddress;
 
+/**
+ * socket封装
+*/
 class Socket : noncopyable{
 public:
     explicit Socket(int sockfd);

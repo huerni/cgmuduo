@@ -2,11 +2,11 @@
 
 #include "Poller.h"
 #include "Timestamp.h"
+
 #include <vector>
 #include <sys/epoll.h>
 
 class Channel;
-class EventLoop;
 
 /**
  *  epoll使用
@@ -28,7 +28,7 @@ private:
     static const int kInitEventListSize = 16;
 
     // 填充活跃通道
-    void fillActiveChannels(int numEvents, ChannelList* activeChannels);
+    void fillActiveChannels(int numEvents, ChannelList* activeChannels) const;
     // 指定更新通道
     void update(int operation, Channel *channel);
 

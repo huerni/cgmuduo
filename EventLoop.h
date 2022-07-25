@@ -17,7 +17,7 @@ class Channel;
 /**
  * 事件循环类，包含Poller与Channel两大模块
 */
-class EventLoop{
+class EventLoop : noncopyable{
 public:
     using Functor = std::function<void()>;
 
@@ -47,6 +47,7 @@ public:
 
     // 判断EventLoop对象是否在自己线程里面
     bool isInLoopThread() const { return threadId_ == CurrentThread::tid(); }
+
 private:
     void handleRead(); // wake up
     void doPendingFunctors(); // 执行回调

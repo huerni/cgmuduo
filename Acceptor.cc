@@ -8,8 +8,9 @@
 
 static int createNonblocking() {
     int sockfd = ::socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK | SOCK_CLOEXEC, 0);
+
     if(sockfd < 0) {
-        LOG_FATAL("%s:%s:%d listen socket create err:%d \n", __FILE__, __FUNCTION__, __LINE__, errno);
+        LOG_FATAL("[%s:%s:%d] listen socket create err:%d \n", __FILE__, __FUNCTION__, __LINE__, errno);
     }
     
     return sockfd;
@@ -48,9 +49,9 @@ void Acceptor::handleRead(){
         }
     }
     else {
-        LOG_FATAL("%s:%s:%d accept err:%d \n \n", __FILE__, __FUNCTION__, __LINE__, errno);
+        LOG_FATAL("[%s:%s:%d] accept err:%d \n \n", __FILE__, __FUNCTION__, __LINE__, errno);
         if(errno == EMFILE) { // too many open files
-            LOG_ERROR("%s:%s:%d sockfd reached limit! \n", __FILE__, __FUNCTION__, __LINE__);
+            LOG_ERROR("[%s:%s:%d] sockfd reached limit! \n", __FILE__, __FUNCTION__, __LINE__);
         }
     }
 }
