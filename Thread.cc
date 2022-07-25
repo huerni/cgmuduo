@@ -6,7 +6,6 @@
 // 静态类成员变量需在类外单独初始化
 std::atomic_int Thread::numCreated_(0);
 
-
 Thread::Thread(ThreadFunc func, const std::string &name)
         : started_(false), joined_(false), tid_(0), func_(std::move(func)), name_(name) {
     setDefaultName();
@@ -29,7 +28,7 @@ void Thread::start() {
     thread_ = std::shared_ptr<std::thread>(new std::thread([&](){
         tid_ = CurrentThread::tid();
         sem_post(&sem);
-        func_();
+        func_;
     }));
     
     // 这里需要等待获取上面新创建的线程的tid值
@@ -42,7 +41,6 @@ void Thread::join() {
     thread_->join();
 }
 
-// 线程名
 void Thread::setDefaultName() {
     int num = ++numCreated_;
     if(name_.empty()) {

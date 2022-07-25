@@ -29,7 +29,6 @@ public:
     // 获取loop默认IO复用具体实现
     static Poller* newDefaultPoller(EventLoop* loop);
 protected:
-    // map的key：sockfd  value：sockfd所属的channel通道类型
     using ChannelMap = std::unordered_map<int, Channel*>;
     ChannelMap channels_;
 private:

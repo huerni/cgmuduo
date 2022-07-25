@@ -21,20 +21,17 @@ void Channel::tie(const std::shared_ptr<void>& obj) {
     tied_ = true;
 }
  
-// 更新状态
 void Channel::update() {
     loop_->updateChannel(this);
 }
 
-// 删除状态
 void Channel::remove() {
     loop_->removeChannel(this);
 }
 
 void Channel::HandleEvent(Timestamp receiveTime) {
     if(tied_) {
-        // 如果对象存在，lock()函数返回一个指向共享对象的shared_ptr(引用计数会增1)，否则返回一个空shared_ptr。
-        std::shared_ptr<void> guard = tie_.lock(); 
+        std::shared_ptr<void> guard = tie_.lock();
         if(guard) {
             handleEventWithGuard(receiveTime);
         }
@@ -44,9 +41,7 @@ void Channel::HandleEvent(Timestamp receiveTime) {
     }
 }
 
-// 根据fd自身状态做出相应的回调
 void Channel::handleEventWithGuard(Timestamp receiveTime) {
-
     if((revents_ & EPOLLHUP) && !(revents_ & EPOLLIN)) {
         if(closeCallback_) {
             closeCallback_();
@@ -59,7 +54,7 @@ void Channel::handleEventWithGuard(Timestamp receiveTime) {
         }
     }
 
-    if(revents_ & (EPOLLIN | EPOLLPRI)) {
+    if(revents_ & EPOLLIN) {
         if(readCallback_) {
             readCallback_(receiveTime);
         }

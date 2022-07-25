@@ -9,7 +9,6 @@ class EventLoop;
 
 /**
  * 通道类，封装了一个socketfd及其event，存在一系列回调函数，绑定了poller返回的具体事件
- * 
 */
 class Channel : noncopyable{
 public:
@@ -34,8 +33,8 @@ public:
 
     int fd() const { return fd_; }
     int events() const { return events_; }
-    int set_revents(int revt) { revents_ = revt; }
-    
+    void set_revents(int revt) { revents_ = revt; }
+    bool isNoneEvent() const { return events_ == KNoneEvent; }
 
     // 更新fd感兴趣的事件events
     void enableReading() { events_ |= KReadEvent; update(); }
@@ -44,7 +43,6 @@ public:
     void disableWriting() { events_ &= ~KWriteEvent; update(); }
     void disableAll() { events_ = KNoneEvent; update(); }
 
-    bool isNoneEvent() const { return events_ == KNoneEvent; }
     bool isWriteEvent() const { return events_ & KWriteEvent; }
     bool inReadEvent() const { return events_ & KReadEvent; }
 
@@ -53,7 +51,8 @@ public:
 
     EventLoop* ownerLoop() { return loop_; }
     void remove();
-    
+
+
 private:
     // 通知所属的eventloop更新events
     void update();

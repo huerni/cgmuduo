@@ -24,16 +24,12 @@ int createEventfd() {
 }
 
 EventLoop::EventLoop() 
-    : looping_(false), quit_(false), callingPendingFunctors_(false)
-    , threadId_(CurrentThread::tid())
-    , poller_(Poller::newDefaultPoller(this))
-    , wakeupFd_(createEventfd())
-    , wakeupChannel_(new Channel(this, wakeupFd_)) {
-
-    LOG_INFO(" [%s:%s:%d] EventLoop created %p in thread %d \n", __FILE__, __FUNCTION__, __LINE__, this, threadId_);
-
+    : looping_(false), quit_(false), callingPendingFunctors_(false), threadId_(CurrentThread::tid())
+    , poller_(Poller::newDefaultPoller(this)), wakeupFd_(createEventfd()), wakeupChannel_(new Channel(this, wakeupFd_)) {
+    
+    LOG_DEBUG("EventLoop created %p in thread %d \n", this, threadId_);
     if(t_loopInThisThread) {
-        LOG_ERROR("Another EventLoop %p exists in this thread %d \n", t_loopInThisThread);
+        LOG_ERROR("Another EventLoop %p exists in this thrad %d \n", t_loopInThisThread);
     }
     else {
         t_loopInThisThread = this;
@@ -54,19 +50,14 @@ EventLoop::~EventLoop() {
 void EventLoop::loop() {
     looping_ = true;
     quit_ = false;
-
-    LOG_INFO(" [%s:%s:%d] EventLoop %p start looping \n", __FILE__, __FUNCTION__, __LINE__, this);
-
     while(!quit_) {
-        activeChannels_.clear();
         pollReturnTime_ = poller_->poll(kPollTimeMs, &activeChannels_);
         for(Channel *channel : activeChannels_) {
-            channel->HandleEvent(pollReturnTime_); // 处理对应事件回调
+            channel->HandleEvent(pollReturnTime_);
         }
         doPendingFunctors();
     }
-    
-    LOG_INFO(" [%s:%s:%d] EventLoop %p stop looping \n", __FILE__, __FUNCTION__, __LINE__, this);
+    LOG_INFO("EventLoop %p stop looping. \n", this);
     looping_ = false;
 }
 
@@ -121,7 +112,7 @@ void EventLoop::wakeup() {
     }
 }
 
-// 接收唤醒
+
 void EventLoop::handleRead() {
     uint64_t one = 1;
     ssize_t n = read(wakeupFd_, &one, sizeof one);
