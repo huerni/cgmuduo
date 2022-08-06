@@ -1,5 +1,6 @@
 
 #include "Timestamp.h"
+
 #include <time.h>
 
 Timestamp::Timestamp() : microSecondsSinceEpoch_(0) {}
@@ -7,10 +8,12 @@ Timestamp::Timestamp() : microSecondsSinceEpoch_(0) {}
 Timestamp::Timestamp(int64_t microSecondsSinceEpoch) 
     : microSecondsSinceEpoch_(microSecondsSinceEpoch) {}
 
+// 获取当前时间
 Timestamp Timestamp::now() {
     return Timestamp(time(NULL));
 }
 
+// 打印时间
 std::string Timestamp::toString() const {
     char buf[128] = {0};
     tm *tm_time = localtime(&microSecondsSinceEpoch_);

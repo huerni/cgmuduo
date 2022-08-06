@@ -1,6 +1,5 @@
 #pragma once
 
-
 #include <functional>
 #include <vector>
 #include <atomic>
@@ -13,11 +12,12 @@
 
 
 class Channel;
+class Poller;
 
 /**
  * 事件循环类，包含Poller与Channel两大模块
 */
-class EventLoop{
+class EventLoop : noncopyable{
 public:
     using Functor = std::function<void()>;
 
@@ -57,6 +57,7 @@ private:
     std::atomic_bool quit_;  // 标识退出loop循环
 
     const pid_t threadId_;  // loop所在线程id
+    
     Timestamp pollReturnTime_;  // poller返回发生事件的channels的时间点
     std::unique_ptr<Poller> poller_;  // loop所使用的poller
 

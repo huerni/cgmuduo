@@ -11,22 +11,24 @@
 
 static EventLoop* CheckLoopNotNull(EventLoop* loop) {
     if(loop == nullptr) {
-        LOG_FATAL("%s:%s:%d mainLoop is null! \n", __FILE__, __FUNCTION__, __LINE__);
+        LOG_FATAL("[%s:%s:%d] mainLoop is null! \n", __FILE__, __FUNCTION__, __LINE__);
     }
     return loop;
 }
 
-TcpServer::TcpServer(EventLoop* loop, const InetAddress &listenAddr, 
-        const std::string &nameArg, Option option)
-        : loop_(CheckLoopNotNull(loop))
-        , ipPort_(listenAddr.toIpPort())
-        , name_(nameArg)
-        , acceptor_(new Acceptor(loop, listenAddr, option == kReusePort))
-        , threadPool_(new EventLoopThreadPool(loop, name_))
-        , connectionCallback_()
-        , messageCallback_()
-        , nextConnId_(1)
-        , started_(0) 
+TcpServer::TcpServer(EventLoop* loop, 
+                    const InetAddress &listenAddr, 
+                    const std::string &nameArg, 
+                    Option option)
+                : loop_(CheckLoopNotNull(loop))
+                , ipPort_(listenAddr.toIpPort())
+                , name_(nameArg)
+                , acceptor_(new Acceptor(loop, listenAddr, option == kReusePort))
+                , threadPool_(new EventLoopThreadPool(loop, name_))
+                , connectionCallback_()
+                , messageCallback_()
+                , nextConnId_(1)
+                , started_(0) 
 {
     acceptor_->setNewConnectionCallback(std::bind(&TcpServer::newConnection, this, 
         std::placeholders::_1, std::placeholders::_2));
@@ -54,6 +56,7 @@ void TcpServer::start() {
     }
 }
 
+// 有新连接，使用一个subloop创立connection处理
 void TcpServer::newConnection(int sockfd, const InetAddress &peerAddr) {
     EventLoop *ioLoop = threadPool_->getNextLoop();
     char buf[64] = {0};

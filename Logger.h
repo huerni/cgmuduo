@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+
 #include "noncopyable.h"
 
 
@@ -71,7 +72,7 @@ public:
     void setLogLevel(int level);
     // 写日志
     void log(std::string msg);
+
 private:
     int logLevel_;
-    Logger(){}
 };

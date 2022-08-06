@@ -9,6 +9,9 @@
 #include <atomic>
 #include <unistd.h>
 
+/**
+ * 线程类，封装线程功能
+*/
 class Thread : noncopyable {
 public:
     using ThreadFunc = std::function<void()>;

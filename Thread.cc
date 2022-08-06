@@ -7,7 +7,11 @@
 std::atomic_int Thread::numCreated_(0);
 
 Thread::Thread(ThreadFunc func, const std::string &name)
-        : started_(false), joined_(false), tid_(0), func_(std::move(func)), name_(name) {
+        : started_(false)
+        , joined_(false)
+        , tid_(0)
+        , func_(std::move(func))
+        , name_(name) {
     setDefaultName();
 }
 
@@ -26,10 +30,13 @@ void Thread::start() {
 
     // 开启线程
     thread_ = std::shared_ptr<std::thread>(new std::thread([&](){
+        // 获取线程的tid值
         tid_ = CurrentThread::tid();
         sem_post(&sem);
-        func_;
+        // 开启一个新线程，专门执行该线程函数
+        func_(); 
     }));
+    
     
     // 这里需要等待获取上面新创建的线程的tid值
     // 所以使用信号量先进行阻塞，直到获得tid值

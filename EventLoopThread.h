@@ -10,9 +10,13 @@
 
 class EventLoop;
 
+/**
+ * one loop per thread
+*/
 class EventLoopThread : noncopyable {
 public:
     using ThreadInitCallBack = std::function<void(EventLoop*)>;
+
     EventLoopThread(const ThreadInitCallBack &cb = ThreadInitCallBack(), const std::string &name = std::string());
     ~EventLoopThread();
 

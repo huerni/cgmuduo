@@ -8,9 +8,9 @@
 class EventLoop;
 
 /**
- * 通道类，封装了一个socketfd及其event，存在一系列回调函数，绑定了poller返回的具体事件
+ * 通道类，封装了一个socketfd及其感兴趣的event，存在一系列回调函数，绑定了poller返回的具体事件
 */
-class Channel : noncopyable{
+class Channel : noncopyable {
 public:
     // 回调函数
     using EventCallback = std::function<void()>;
@@ -29,12 +29,13 @@ public:
     void setErrorCallback(EventCallback cb) { errorCallback_ = std::move(cb); }
 
     // 绑定指针，将弱指针转为共享指针
+    // 防止channel被手动关闭时，channel还在执行回调函数
     void tie(const std::shared_ptr<void>& );
 
     int fd() const { return fd_; }
     int events() const { return events_; }
     void set_revents(int revt) { revents_ = revt; }
-    bool isNoneEvent() const { return events_ == KNoneEvent; }
+    
 
     // 更新fd感兴趣的事件events
     void enableReading() { events_ |= KReadEvent; update(); }
@@ -43,15 +44,16 @@ public:
     void disableWriting() { events_ &= ~KWriteEvent; update(); }
     void disableAll() { events_ = KNoneEvent; update(); }
 
+    bool isNoneEvent() const { return events_ == KNoneEvent; }
     bool isWriteEvent() const { return events_ & KWriteEvent; }
     bool inReadEvent() const { return events_ & KReadEvent; }
 
     int index() { return index_; }
     void set_index(int idx) { index_ = idx; }
-
+    
+    // 返回所属于的loop
     EventLoop* ownerLoop() { return loop_; }
     void remove();
-
 
 private:
     // 通知所属的eventloop更新events
@@ -64,16 +66,17 @@ private:
     static const int KReadEvent;
     static const int KWriteEvent;
 
-    EventLoop *loop_;
-    const int fd_;
-    int events_;
-    int revents_;
+    EventLoop *loop_; // 事件循环
+    const int fd_; // 绑定的fd，poller监听的对象
+    int events_;  // 注册fd感兴趣的事件
+    int revents_;  // poller返回的具体发生的事件
     int index_;
 
     std::weak_ptr<void> tie_;
     bool tied_;
 
     // 四种回调函数
+    // channel通道里面能够获知fd最终发生的具体的事件events，所以它负责调用具体的回调函数
     ReadEventCallback readCallback_;
     EventCallback writeCallback_;
     EventCallback closeCallback_;

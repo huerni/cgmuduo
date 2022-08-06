@@ -19,6 +19,7 @@ std::string InetAddress::toIp() const {
 uint16_t InetAddress::toPort() const {
     return ntohs(addr_.sin_port);
 }
+
 std::string InetAddress::toIpPort() const {
     char buf[64] = {0};
     ::inet_ntop(AF_INET, &addr_.sin_addr, buf, sizeof(buf));

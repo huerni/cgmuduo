@@ -24,8 +24,13 @@ int createEventfd() {
 }
 
 EventLoop::EventLoop() 
-    : looping_(false), quit_(false), callingPendingFunctors_(false), threadId_(CurrentThread::tid())
-    , poller_(Poller::newDefaultPoller(this)), wakeupFd_(createEventfd()), wakeupChannel_(new Channel(this, wakeupFd_)) {
+    : looping_(false)
+    , quit_(false)
+    , callingPendingFunctors_(false)
+    , threadId_(CurrentThread::tid())
+    , poller_(Poller::newDefaultPoller(this))
+    , wakeupFd_(createEventfd())
+    , wakeupChannel_(new Channel(this, wakeupFd_)) {
     
     LOG_DEBUG("EventLoop created %p in thread %d \n", this, threadId_);
     if(t_loopInThisThread) {
@@ -51,10 +56,13 @@ void EventLoop::loop() {
     looping_ = true;
     quit_ = false;
     while(!quit_) {
+        activeChannels_.clear();
         pollReturnTime_ = poller_->poll(kPollTimeMs, &activeChannels_);
         for(Channel *channel : activeChannels_) {
+            // Poller监听哪些channel发生事件了，然后上报给EventLoop，通知channel处理相应的事件
             channel->HandleEvent(pollReturnTime_);
         }
+        // 执行当前EventLoop事件循环需要处理的回调操作
         doPendingFunctors();
     }
     LOG_INFO("EventLoop %p stop looping. \n", this);
@@ -84,7 +92,7 @@ void EventLoop::runInLoop(Functor cb) {
 void EventLoop::queueInLoop(Functor cb) {
     {
         std::unique_lock<std::mutex> lock(mutex_);
-        pendingFunctors_.push_back(cb);
+        pendingFunctors_.emplace_back(cb);
     }
 
     if(!isInLoopThread() || callingPendingFunctors_) {

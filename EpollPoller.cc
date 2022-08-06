@@ -1,17 +1,24 @@
 #include "EpollPoller.h"
 #include "Logger.h"
 #include "Channel.h"
+#include "EventLoop.h"
+
 #include <memory.h>
 #include <unistd.h>
 
-const int KNew = -1;
+// channel未添加到poller中
+const int KNew = -1; // channel的成员index = -1
+// channel已添加到poller中
 const int KAdded = 1;
+// channel已从poller中删除
 const int KDeleted = 2;
 
 EpollPoller::EpollPoller(EventLoop* loop) 
-    : Poller(loop), epollfd_(::epoll_create1(EPOLL_CLOEXEC)), events_(kInitEventListSize) { 
+    : Poller(loop)
+    , epollfd_(::epoll_create1(EPOLL_CLOEXEC))
+    , events_(kInitEventListSize) { 
         if(epollfd_ < 0) {
-            LOG_FATAL("epoll_create error:%d", errno);
+            LOG_FATAL("epoll_create error:%d \n", errno);
         }
 }
 
@@ -21,7 +28,7 @@ EpollPoller::~EpollPoller(){
 
 // epoll_wait监听events中的事件，并将活跃通道返回给所属的loop
 Timestamp EpollPoller::poll (int timeoutMs, ChannelList *activeChannels) {
-    LOG_INFO("func=%s => fd total count=%d \n", __FUNCTION__, channels_.size());
+    LOG_INFO("func=%s => fd total count=%lu \n", __FUNCTION__, channels_.size());
     
     int numEvents = ::epoll_wait(epollfd_, &*events_.begin(), static_cast<int>(events_.size()), timeoutMs);
     int saveErrno = errno;
@@ -43,6 +50,7 @@ Timestamp EpollPoller::poll (int timeoutMs, ChannelList *activeChannels) {
             LOG_ERROR("EpollPoller::poll() err!");
         }
     }
+
     return now;
 }
 
@@ -55,11 +63,13 @@ void EpollPoller::updateChannel(Channel* channel) {
             int fd = channel->fd();
             channels_[fd] = channel;
         }
+
         channel->set_index(KAdded);
         update(EPOLL_CTL_ADD, channel);
     }
     else {
         int fd = channel->fd();
+        // 对任何事件不感兴趣
         if(channel->isNoneEvent()) {
             update(EPOLL_CTL_DEL, channel);
             channel->set_index(KDeleted);
@@ -83,13 +93,14 @@ void EpollPoller::removeChannel(Channel* channel) {
 }
 
 // 填充活跃通道
-void EpollPoller::fillActiveChannels(int numEvents, ChannelList* activeChannels) {
-    LOG_INFO("func=%s => num total count=%d", numEvents);
-    
+void EpollPoller::fillActiveChannels(int numEvents, ChannelList* activeChannels) const {
+
     for(int i = 0; i<numEvents; ++i) {
-        Channel* channel = static_cast<Channel*>(events_[i].data.ptr);
+        // TODO: void指针转化为channel对象出错？？ 无法获取类成员，发生段错误
+        Channel* channel = static_cast<Channel *>(events_[i].data.ptr);
+        LOG_INFO("channel: %d", channel->fd());
         channel->set_revents(events_[i].events);
-        activeChannels->push_back(channel);
+        activeChannels->push_back(channel); // eventloop拿到了poller返回的所有事件的channel列表
     }
 }
 
@@ -99,7 +110,7 @@ void EpollPoller::update(int operation, Channel *channel) {
     epoll_event event;
     bzero(&event, sizeof event);
     event.events = channel->events();
-    event.data.ptr = channel;
+    event.data.ptr = (void*)channel;
     event.data.fd = fd;
 
     if(::epoll_ctl(epollfd_, operation, fd, &event) < 0) {

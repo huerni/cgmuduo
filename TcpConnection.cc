@@ -5,6 +5,13 @@
 #include "EventLoop.h"
 
 #include <functional>
+#include <errno.h>
+#include <sys/types.h>         
+#include <sys/socket.h>
+#include <strings.h>
+#include <netinet/tcp.h>
+#include <sys/socket.h>
+#include <string>
 #include <unistd.h>
 
 static EventLoop* CheckLoopNotNull(EventLoop* loop) {
@@ -16,10 +23,16 @@ static EventLoop* CheckLoopNotNull(EventLoop* loop) {
 
 TcpConnection::TcpConnection(EventLoop* loop, const std::string &name, int sockfd
         , const InetAddress& localAddr
-        , const InetAddress& peerAddr) : loop_(CheckLoopNotNull(loop)), name_(name)
-        , state_(kConnecting), reading_(true)
-        , socket_(new Socket(sockfd)), channel_(new Channel(loop, sockfd))
-        , localAddr_(localAddr), peerAddr_(peerAddr), highWaterMark_(64*1024*1024) {
+        , const InetAddress& peerAddr) 
+        : loop_(CheckLoopNotNull(loop))
+        , name_(name)
+        , state_(kConnecting)
+        , reading_(true)
+        , socket_(new Socket(sockfd))
+        , channel_(new Channel(loop, sockfd))
+        , localAddr_(localAddr)
+        , peerAddr_(peerAddr)
+        , highWaterMark_(64*1024*1024) {
 
     channel_->setReadCallback(std::bind(&TcpConnection::handleRead, this, std::placeholders::_1));
     channel_->setWriteCallback(std::bind(&TcpConnection::handleWrite, this));
@@ -51,8 +64,9 @@ void TcpConnection::handleRead(Timestamp receiveTime) {
 }
 
 void TcpConnection::handleWrite() {
-    int saveError = 0;
+    
     if(channel_->isWriteEvent()) {
+        int saveError = 0;
         int n = outputBuffer_.writeFd(channel_->fd(), &saveError);
         if(n > 0) {
             outputBuffer_.retrieve(n);

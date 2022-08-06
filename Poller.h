@@ -2,6 +2,7 @@
 
 #include "noncopyable.h"
 #include "Timestamp.h"
+
 #include <vector>
 #include <unordered_map>
 
@@ -28,10 +29,13 @@ public:
 
     // 获取loop默认IO复用具体实现
     static Poller* newDefaultPoller(EventLoop* loop);
+
 protected:
+    // fd, channle实例
     using ChannelMap = std::unordered_map<int, Channel*>;
+    // poller监视的所有channels
     ChannelMap channels_;
 private:
-    EventLoop* ownerloop_;
+    EventLoop* ownerloop_; // 所属的事件训练loop
 
 };

@@ -3,6 +3,7 @@
 #include <iostream>
 
 // 单例模式，获取唯一单例对象
+// 懒汉模式
 Logger& Logger::instance(){
     static Logger logger;
     return logger;
@@ -30,5 +31,6 @@ void Logger::log(std::string msg) {
         std::cout << "[DEBUG] ";
         break;
     }
+    
     std::cout << Timestamp::now().toString() << msg <<std::endl;
 }

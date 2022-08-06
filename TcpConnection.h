@@ -28,9 +28,7 @@ public:
     bool connected() const { return state_ == kConnected; }
   
     void send(const std::string &buf);
-    void sendInLoop(const void *message, size_t len);
     void shutdown();
-    void shutdownInLoop();
 
     void setConnectionCallback(const ConnectionCallback& cb) {
         connectionCallback_ = cb;
@@ -58,6 +56,9 @@ private:
     void handleWrite();
     void handleClose();
     void handleError();
+
+    void sendInLoop(const void* message, size_t len);
+    void shutdownInLoop();
 
     // 四种状态
     enum StateE { kDisconnected, kConnecting, kConnected, kDisconnecting};

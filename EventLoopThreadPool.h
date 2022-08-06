@@ -18,6 +18,7 @@ public:
     ~EventLoopThreadPool();
 
     void setThreadNum(int numThreads) { numThreads_ = numThreads; }
+    
     void start(const ThreadInitCallBack &cb = ThreadInitCallBack());
 
     EventLoop* getNextLoop();

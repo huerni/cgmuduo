@@ -1,1 +1,3 @@
 /home/cgMuduo/build/CMakeFiles/cgmuduo.dir
+/home/cgMuduo/build/CMakeFiles/edit_cache.dir
+/home/cgMuduo/build/CMakeFiles/rebuild_cache.dir

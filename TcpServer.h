@@ -14,6 +14,9 @@
 #include <atomic>
 #include <functional>
 
+/**
+ * 对外服务器编程使用的类，面向使用用户
+*/
 class TcpServer : noncopyable {
 public:
     using ThreadInitCallback = std::function<void(EventLoop*)>;
@@ -23,7 +26,10 @@ public:
         kReusePort,
     };
 
-    TcpServer(EventLoop* loop, const InetAddress &listAddr, const std::string &nameArg, Option option = kNoReusePort);
+    TcpServer(EventLoop* loop, 
+                const InetAddress &listAddr, 
+                const std::string &nameArg, 
+                Option option = kNoReusePort);
     ~TcpServer();
 
     void setThreadInitcallback(const ThreadInitCallback &cb) { threadInitCallback_ = cb; }
@@ -31,8 +37,9 @@ public:
     void setMessageCallback(const MessageCallback &cb) { messageCallback_ = cb; }
     void setWriteCompleteCallback(const WriteCompleteCallback &cb) { writeCompleteCallback_ = cb; }
 
-    void setThreadNum(int threadNum);
+    void setThreadNum(int numThreads);
 
+    // 开启服务器监听
     void start();
 
 private:
@@ -42,12 +49,12 @@ private:
 
     using ConnectionMap = std::unordered_map<std::string, TcpConnectionPtr>;
 
-    EventLoop *loop_;
+    EventLoop *loop_; // baseloop  用户定义的loop
     
     const std::string ipPort_;
     const std::string name_;
 
-    std::unique_ptr<Acceptor> acceptor_;
+    std::unique_ptr<Acceptor> acceptor_; // 运行在mainloop，用于监听新连接
     
     std::shared_ptr<EventLoopThreadPool> threadPool_;
 

@@ -2,9 +2,12 @@
 #include "EventLoop.h"
 
 EventLoopThread::EventLoopThread(const ThreadInitCallBack &cb, const std::string &name)
-        : loop_(nullptr), exiting_(false)
+        : loop_(nullptr)
+        , exiting_(false)
         , thread_(std::bind(&EventLoopThread::threadFunc, this), name)
-        , mutex_(), cond_(), callback_(cb) {
+        , mutex_()
+        , cond_()
+        , callback_(cb) {
 
 }
 EventLoopThread::~EventLoopThread() {
@@ -16,7 +19,9 @@ EventLoopThread::~EventLoopThread() {
 }
 
 EventLoop* EventLoopThread::startLoop() {
+
     thread_.start();
+
     EventLoop *loop = nullptr;
     {
         std::unique_lock<std::mutex> lock(mutex_);
@@ -28,6 +33,7 @@ EventLoop* EventLoopThread::startLoop() {
     }
     return loop;
 }
+
 // 新线程调用该函数
 void EventLoopThread::threadFunc() {
     EventLoop loop;
@@ -41,6 +47,7 @@ void EventLoopThread::threadFunc() {
         loop_ = &loop;
         cond_.notify_one(); 
     }
+
     loop.loop(); // 开始事件循环，Poller启动
     std::unique_lock<std::mutex> lock(mutex_);
     loop_ = nullptr;
