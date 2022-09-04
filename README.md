@@ -21,3 +21,5 @@ linux下，项目编译执行`./autobuild.sh`，测试用例进入`example/`文�
 2. 一旦有客户端请求连接，**Accetor**调用**TcpServer**设置的**newConnectionCallback_**，将请求分发给**subLoop**(子线程)，即从线程池中取出，然后将连接丢给子线程，由**TcpConnection**处理，此后该连接的所有操作都由该子线程独自处理，与其他线程无关。
 3. **TcpConnection**将读，写，关闭，错误操作与回调填充至绑定的**Channel**，然后调用`runInLoop()`和`queueInLoop()`由底层事件循环处理。
 4. 底层事件循环中，主线程称为**baseLoop**，只执行监听操作与用户回调。而子线程具体执行操作由**Channel**具体返回的事件所执行。由图所示，蓝色部分由三类组成，**EventLoop**，**Channel**和**Poller**。每个**EventLoop**分别与各自的线程绑定，同时将**Poller**和**Channel**连接起来，调用**loop()**方法将**Channel**的结果送入**Poller**执行，将**Poller**返回的结果各自送入**Channel**执行。
+  
+## 如有问题，欢迎指正，欢迎star
