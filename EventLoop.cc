@@ -23,7 +23,7 @@ int createEventfd() {
     return evtfd;
 }
 
-EventLoop::EventLoop() 
+EventLoop::EventLoop()
     : looping_(false)
     , quit_(false)
     , callingPendingFunctors_(false)
@@ -104,9 +104,11 @@ void EventLoop::queueInLoop(Functor cb) {
 void EventLoop::updateChannel(Channel* channel) {
     poller_->updateChannel(channel);
 }
+
 void EventLoop::removeChannel(Channel* channel) {
     poller_->removeChannel(channel);
 }
+
 bool EventLoop::hasChannel(Channel* channel) {
     return poller_->hasChannel(channel);
 }

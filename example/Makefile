@@ -1,6 +1,5 @@
-testserver:
-	g++ -o testserver testserver.cc -lcgmuduo -lpthread -g
-
+echoServer:
+	g++ -o echoServer echoServer.cc -lcgmuduo -lpthread -g
 
 clean:
-	rm -f testserver
+	rm -f echoServer

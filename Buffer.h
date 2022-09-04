@@ -24,7 +24,7 @@ public:
          return buffer_.size() - writerIndex_;
     }
 
-
+    // 可读位置之前的大小(包含预留空间+已读空间)
     size_t prependableBytes() const {
         return readerIndex_;
     }
@@ -99,10 +99,13 @@ private:
 
     // 扩充空间
     void makeSpace(size_t len) {
+        // 当可写空间+已读空间不足时，扩充vector长度
+        // (因为可读位置每次读取是向后走的，这样前面会有一段不可用但空白区域，类似线性队列)
         if(writableBytes() + prependableBytes() < len + kCheapPrepend) {
-            // 可写大小只扩充到len
+            
             buffer_.resize(writerIndex_ + len);
         }
+        // 否则不需要扩充，只要将可读数据向前移动即可。
         else {
             size_t readable = readableBytes();
             std::copy(begin() + readerIndex_, begin() + writerIndex_, begin() + kCheapPrepend);

@@ -28,11 +28,13 @@ public:
     bool started() const { return started_; }
     const std::string name() const { return name_; }
 private:
+    // 主loop，最开始用户创建的loop，在多线程环境下，可看做reactor，用来分发线程
     EventLoop *baseLoop_;
     std::string name_;
     bool started_;
-    int numThreads_;
+    int numThreads_;  //　线程数量
     int next_;
+    // 线程池中的线程与loop
     std::vector<std::unique_ptr<EventLoopThread>> threads_;
     std::vector<EventLoop*> loops_;
 };

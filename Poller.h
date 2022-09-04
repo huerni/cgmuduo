@@ -37,5 +37,4 @@ protected:
     ChannelMap channels_;
 private:
     EventLoop* ownerloop_; // 所属的事件训练loop
-
 };

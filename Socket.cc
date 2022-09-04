@@ -36,6 +36,7 @@ int Socket::accept(InetAddress *peeraddr) {
     }
     return connfd;
 }
+
 void Socket::shutdownWrite() {
     if(::shutdown(sockfd_, SHUT_WR) < 0) {
         LOG_ERROR("shutdownWrite error\n");

@@ -56,8 +56,10 @@ Timestamp EpollPoller::poll (int timeoutMs, ChannelList *activeChannels) {
 
 // 更新channel  如果没在Poller中，则添加，否则有活动，修改，如果没有活动，从Poller监测中移除(EPOLL_CTL_DEL)，但不移除map
 void EpollPoller::updateChannel(Channel* channel) {
+     // 获取Channel在poller的状态  未监听/已监听/已删除
     const int index = channel->index();
     LOG_INFO("func=%s => fd=%d, events=%d, index=%d \n", __FUNCTION__, channel->fd(), channel->events(), channel->index());
+    // 如果poller面对一个新的Channel或者已经删除的Channel
     if(index == KNew || index == KDeleted) {
         if(index == KNew) {
             int fd = channel->fd();
@@ -67,13 +69,15 @@ void EpollPoller::updateChannel(Channel* channel) {
         channel->set_index(KAdded);
         update(EPOLL_CTL_ADD, channel);
     }
+    // Channel在poller的监听列表中
     else {
         int fd = channel->fd();
-        // 对任何事件不感兴趣
+        // 如果Channel已经对任何事件不感兴趣，则把它剔除
         if(channel->isNoneEvent()) {
             update(EPOLL_CTL_DEL, channel);
             channel->set_index(KDeleted);
         }
+        // 否则，直接更新它的状态
         else {
             update(EPOLL_CTL_MOD, channel);
         }
@@ -97,14 +101,14 @@ void EpollPoller::fillActiveChannels(int numEvents, ChannelList* activeChannels)
 
     for(int i = 0; i<numEvents; ++i) {
         // TODO: void指针转化为channel对象出错？？ 无法获取类成员，发生段错误
-        Channel* channel = static_cast<Channel *>(events_[i].data.ptr);
+        Channel* channel = static_cast<Channel*>(events_[i].data.ptr);
         LOG_INFO("channel: %d", channel->fd());
         channel->set_revents(events_[i].events);
         activeChannels->push_back(channel); // eventloop拿到了poller返回的所有事件的channel列表
     }
 }
 
-// 指定操作更新通道 epoll_ctl具体操作  add/mod/del
+// 指定操作更新Channel epoll_ctl具体操作  add/mod/del
 void EpollPoller::update(int operation, Channel *channel) {
     int fd = channel->fd();
     epoll_event event;
