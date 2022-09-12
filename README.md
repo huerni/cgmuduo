@@ -20,6 +20,7 @@ linux下，项目编译执行`./autobuild.sh`，测试用例进入`example/`文�
 | Acceptor                   |
 | TcpConnection              |
 | TcpServer                  |  
+  
 `Channel.*`，`Poller.*`，`EventLoop.*`  三类为一体，在底层负责事件循环。**EventLoop**包含**Channel**，**Poller**，**EventLoop**负责轮询访问**Poller**，得到激活**Channel**列表，使**Channel**自己根据自身情况调用相应回调。  
 
 `Thread.*`，`EventLoopThread.*`，`EventLoopThreadPool.*`将线程与**EventLoop**绑定在一起，实现**one loop per thread** + thread pool线程模型。  
