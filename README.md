@@ -9,6 +9,17 @@ muduo是一个基于非阻塞IO和事件驱动的C++网络库，采用Reactor模
 linux下，项目编译执行`./autobuild.sh`，测试用例进入`example/`文件夹，make生成测试程序  
   
 ## 类功能介绍
+| 核心模块                   |
+| -------------------------- |
+| Socket                     |
+| Buffer                     |
+| Channel                    |
+| Poller与Epoller            |
+| EventLoop与EventLoopThread |
+| EventLoopThreadPool        |
+| Acceptor                   |
+| TcpConnection              |
+| TcpServer                  |  
 `Channel.*`，`Poller.*`，`EventLoop.*`  三类为一体，在底层负责事件循环。**EventLoop**包含**Channel**，**Poller**，**EventLoop**负责轮询访问**Poller**，得到激活**Channel**列表，使**Channel**自己根据自身情况调用相应回调。  
 
 `Thread.*`，`EventLoopThread.*`，`EventLoopThreadPool.*`将线程与**EventLoop**绑定在一起，实现**one loop per thread** + thread pool线程模型。  
@@ -23,18 +34,6 @@ linux下，项目编译执行`./autobuild.sh`，测试用例进入`example/`文�
 4. 底层事件循环中，主线程称为**baseLoop**，只执行监听操作与用户回调。而子线程具体执行操作由**Channel**具体返回的事件所执行。由图所示，蓝色部分由三类组成，**EventLoop**，**Channel**和**Poller**。每个**EventLoop**分别与各自的线程绑定，同时将**Poller**和**Channel**连接起来，调用**loop()**方法将**Channel**的结果送入**Poller**执行，将**Poller**返回的结果各自送入**Channel**执行。
 
 ## 学习记录
-| 核心模块                   |
-| -------------------------- |
-| Socket                     |
-| Buffer                     |
-| Channel                    |
-| Poller与Epoller            |
-| EventLoop与EventLoopThread |
-| EventLoopThreadPool        |
-| Acceptor                   |
-| TcpConnection              |
-| TcpServer                  |  
-
 [muduo剖析(1)](https://www.cgsx.online/archives/muduo%E5%89%96%E6%9E%901)  
 [muduo剖析(2)](https://www.cgsx.online/archives/muduo%E5%BA%93%E5%89%96%E6%9E%902#muduo%E5%BA%93%E5%89%96%E6%9E%90(2))
   
