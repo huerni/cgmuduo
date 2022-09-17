@@ -4,6 +4,7 @@
 
 #include <string>
 #include <functional>
+#include <unistd.h>
 
 class EchoServer {
 public:
@@ -17,7 +18,7 @@ public:
             std::bind(&EchoServer::onMessage, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)
         );
 
-        server_.setThreadNum(3);
+        //server_.setThreadNum(3);
     }
 
     void start() {
@@ -36,6 +37,7 @@ private:
     
     void onMessage(const TcpConnectionPtr& conn, Buffer* buf, Timestamp time) {
         std::string msg = buf->retrieveAllAsString();
+        LOG_INFO("%s echo %d bytes, data received at %s", conn->name(), msg.size(), time.toString());
         conn->send(msg);
         conn->shutdown();
     }
@@ -45,10 +47,12 @@ private:
 };
 
 int main(){
+    LOG_INFO("pid = %d", getpid());
     EventLoop loop;
     InetAddress addr(8001);
     EchoServer server(&loop, addr);
     server.start();
     loop.loop();
+
     return 0;
 }

@@ -4,6 +4,7 @@
 #include <sys/uio.h>
 #include <unistd.h>
 
+const char Buffer::KCRLF[] = "\r\n";
 
 /**
  * 从fd上读取数据
@@ -21,6 +22,7 @@ ssize_t Buffer::readFd(int fd, int* saveErrno) {
     vec[1].iov_len = sizeof extraBuffer;
 
     const int iovcnt = (writable < sizeof extraBuffer) ? 2 : 1;
+    // 从fd中读取
     const ssize_t n = ::readv(fd, vec, iovcnt);
     if(n < 0) {
         *saveErrno = errno;

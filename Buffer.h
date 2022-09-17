@@ -82,6 +82,11 @@ public:
     const char* beginWrite() const {
         return begin() + writerIndex_;
     }
+
+    const char* findCRLF() const {
+        const char* crlf = std::search(peek(), beginWrite(), KCRLF, KCRLF+2);
+        return crlf == beginWrite() ? NULL : crlf;
+    }
     
     ssize_t readFd(int fd, int* saveErrno);
 
@@ -117,4 +122,6 @@ private:
     std::vector<char> buffer_;
     size_t readerIndex_;
     size_t writerIndex_;
+
+    static const char KCRLF[];
 };

@@ -100,7 +100,6 @@ void EpollPoller::removeChannel(Channel* channel) {
 void EpollPoller::fillActiveChannels(int numEvents, ChannelList* activeChannels) const {
 
     for(int i = 0; i<numEvents; ++i) {
-        // TODO: void指针转化为channel对象出错？？ 无法获取类成员，发生段错误
         Channel* channel = static_cast<Channel*>(events_[i].data.ptr);
         LOG_INFO("channel: %d", channel->fd());
         channel->set_revents(events_[i].events);
@@ -110,12 +109,13 @@ void EpollPoller::fillActiveChannels(int numEvents, ChannelList* activeChannels)
 
 // 指定操作更新Channel epoll_ctl具体操作  add/mod/del
 void EpollPoller::update(int operation, Channel *channel) {
-    int fd = channel->fd();
-    epoll_event event;
+    
+    struct epoll_event event;
     bzero(&event, sizeof event);
     event.events = channel->events();
-    event.data.ptr = (void*)channel;
-    event.data.fd = fd;
+    event.data.ptr = channel;
+    int fd = channel->fd();
+    //event.data.fd = fd;
 
     if(::epoll_ctl(epollfd_, operation, fd, &event) < 0) {
         if(operation == EPOLL_CTL_DEL) {

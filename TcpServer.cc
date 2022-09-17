@@ -16,6 +16,15 @@ static EventLoop* CheckLoopNotNull(EventLoop* loop) {
     return loop;
 }
 
+void defaultConnectionCallback(const TcpConnectionPtr& conn) {
+    std::string isConnected = ((conn->connected()) ? "UP" : "DOWN");
+    LOG_INFO("%s -> %s is %s \n", conn->localAddr().toIpPort().c_str(), conn->peerAddr().toIpPort().c_str(), isConnected.c_str());
+}
+
+void defaultMessageCallback(const TcpConnectionPtr&, Buffer* buf, Timestamp) {
+    buf->retrieveAll();
+}
+
 TcpServer::TcpServer(EventLoop* loop, 
                     const InetAddress &listenAddr, 
                     const std::string &nameArg, 
@@ -25,8 +34,8 @@ TcpServer::TcpServer(EventLoop* loop,
                 , name_(nameArg)
                 , acceptor_(new Acceptor(loop, listenAddr, option == kReusePort))
                 , threadPool_(new EventLoopThreadPool(loop, name_))
-                , connectionCallback_()
-                , messageCallback_()
+                , connectionCallback_(defaultConnectionCallback)
+                , messageCallback_(defaultMessageCallback)
                 , nextConnId_(1)
                 , started_(0) 
 {

@@ -66,6 +66,7 @@ void Channel::handleEventWithGuard(Timestamp receiveTime) {
 
     if(revents_ & (EPOLLIN | EPOLLPRI)) {
         if(readCallback_) {
+            // fixme: bad_function_call
             readCallback_(receiveTime);
         }
     }

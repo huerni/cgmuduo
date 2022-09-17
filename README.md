@@ -37,5 +37,12 @@ linux下，项目编译执行`./autobuild.sh`，测试用例进入`example/`文�
 ## 学习记录
 [muduo剖析(1)](https://www.cgsx.online/archives/muduo%E5%89%96%E6%9E%901)  
 [muduo剖析(2)](https://www.cgsx.online/archives/muduo%E5%BA%93%E5%89%96%E6%9E%902#muduo%E5%BA%93%E5%89%96%E6%9E%90(2))
-  
+
+## fix bugs
+
+1. 没有设置ConnectionCallback和MessageCallback，当连接时，报错bad_function_call
+> 设置defaultConnectionCallback和defaultMessageCallback，并在构建TcpServer时初始化  
+2. Epollpoller.cc:103处发生段错误，似乎是`static_cast<Channel*>`出问题
+> 可能因为没有在epoll_event添加struct
+
 ## 如有问题，欢迎指正，欢迎star
