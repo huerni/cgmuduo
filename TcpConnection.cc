@@ -52,7 +52,6 @@ void TcpConnection::handleRead(Timestamp receiveTime) {
     // 从fd中读取
     int n = inputBuffer_.readFd(channel_->fd(), &saveError);
     if(n > 0) {
-        // FIXME: 接收消息时发生段错误，但只有自定义消息函数报错，默认消息函数正常运行？？
         messageCallback_(shared_from_this(), &inputBuffer_, receiveTime);
     }
     else if(n == 0) {
