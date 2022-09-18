@@ -3,7 +3,6 @@
 
 void onConnection(const TcpConnectionPtr& conn) {
     if(conn->connected()) {
-        std::cout<<1;
         conn->shutdown();
     }
 }

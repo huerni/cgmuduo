@@ -52,6 +52,7 @@ void TcpConnection::handleRead(Timestamp receiveTime) {
     // 从fd中读取
     int n = inputBuffer_.readFd(channel_->fd(), &saveError);
     if(n > 0) {
+        // TODO: 接收消息时发生段错误，
         messageCallback_(shared_from_this(), &inputBuffer_, receiveTime);
     }
     else if(n == 0) {

@@ -2,10 +2,15 @@
 #include <cgmuduo/TcpServer.h>
 #include <cgmuduo/Logger.h>
 
+#include <string>
+#include <functional>
+#include <unistd.h>
+
+
 void onMessage(const TcpConnectionPtr& conn, Buffer* buf, Timestamp receiveTime) {
-    if(buf->findCRLF()) {
-        conn->shutdown();
-    }
+    LOG_INFO("connection up message");
+
+    
 }
 
 void onConnection(const TcpConnectionPtr& conn) {
@@ -20,7 +25,11 @@ void onConnection(const TcpConnectionPtr& conn) {
 int main() {
     EventLoop loop;
     TcpServer server(&loop, InetAddress(1079), "finger");
+    
     server.setMessageCallback(onMessage);
+    server.setConnectionCallback(onConnection);
     server.start();
     loop.loop();
+
+    return 0;
 }
