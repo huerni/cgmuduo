@@ -33,6 +33,7 @@ private:
         else {
             LOG_INFO("connection down : %s", conn->peerAddr().toIpPort().c_str());
         }
+        
     }
     
     void onMessage(const TcpConnectionPtr& conn, Buffer* buf, Timestamp time) {

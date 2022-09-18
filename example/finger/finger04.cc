@@ -1,16 +1,14 @@
 #include <cgmuduo/EventLoop.h>
 #include <cgmuduo/TcpServer.h>
 #include <cgmuduo/Logger.h>
+#include <cgmuduo/Buffer.h>
+#include <cgmuduo/Timestamp.h>
 
 #include <string>
-#include <functional>
-#include <unistd.h>
 
 
 void onMessage(const TcpConnectionPtr& conn, Buffer* buf, Timestamp receiveTime) {
     LOG_INFO("connection up message");
-
-    
 }
 
 void onConnection(const TcpConnectionPtr& conn) {
@@ -25,9 +23,8 @@ void onConnection(const TcpConnectionPtr& conn) {
 int main() {
     EventLoop loop;
     TcpServer server(&loop, InetAddress(1079), "finger");
-    
-    server.setMessageCallback(onMessage);
     server.setConnectionCallback(onConnection);
+    server.setMessageCallback(onMessage);
     server.start();
     loop.loop();
 

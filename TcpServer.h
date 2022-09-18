@@ -68,5 +68,4 @@ private:
 
     int nextConnId_;
     ConnectionMap connections_;
-
 };

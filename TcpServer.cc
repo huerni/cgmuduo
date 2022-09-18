@@ -21,7 +21,8 @@ void defaultConnectionCallback(const TcpConnectionPtr& conn) {
     LOG_INFO("%s -> %s is %s \n", conn->localAddr().toIpPort().c_str(), conn->peerAddr().toIpPort().c_str(), isConnected.c_str());
 }
 
-void defaultMessageCallback(const TcpConnectionPtr&, Buffer* buf, Timestamp) {
+void defaultMessageCallback(const TcpConnectionPtr& conn, Buffer* buf, Timestamp) {
+    LOG_INFO("%s -> %s \n", conn->localAddr().toIpPort().c_str(), conn->peerAddr().toIpPort().c_str());
     buf->retrieveAll();
 }
 
