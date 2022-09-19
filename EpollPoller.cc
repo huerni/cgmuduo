@@ -89,6 +89,7 @@ void EpollPoller::removeChannel(Channel* channel) {
     int fd = channel->fd();
     int index = channel->index();
     LOG_INFO("func=%s => fd=%d, index=%d \n", __FUNCTION__, channel->fd(), channel->index());
+
     if(index == KAdded) {
         update(EPOLL_CTL_DEL, channel);
     }
@@ -113,9 +114,10 @@ void EpollPoller::update(int operation, Channel *channel) {
     struct epoll_event event;
     bzero(&event, sizeof event);
     event.events = channel->events();
-    event.data.ptr = channel;
     int fd = channel->fd();
-    //event.data.fd = fd;
+    event.data.fd = fd;
+    event.data.ptr = channel;
+    
 
     if(::epoll_ctl(epollfd_, operation, fd, &event) < 0) {
         if(operation == EPOLL_CTL_DEL) {

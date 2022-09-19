@@ -168,6 +168,7 @@ void TcpConnection::shutdown() {
 
 void TcpConnection::shutdownInLoop() {
     if(!channel_->isWriteEvent()) {
+
         socket_->shutdownWrite();
     }
 }
@@ -175,19 +176,22 @@ void TcpConnection::shutdownInLoop() {
 
 // 连接建立
 void TcpConnection::connectEstableished() {
-    state_ = kConnected;
+    setState(kConnected);
     channel_->tie(shared_from_this()); // 绑定
     channel_->enableReading(); // 设置可读
+
     connectionCallback_(shared_from_this());
 }
 
 // 连接销毁 
+
 void TcpConnection::connectDestroyed() {
     if(state_ == kConnected) {
         setState(kDisconnected);
         channel_->disableAll();
         connectionCallback_(shared_from_this());
     }
+    
     channel_->remove();
 }
 

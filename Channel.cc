@@ -30,6 +30,7 @@ void Channel::update() {
 }
 
 void Channel::remove() {
+    
     loop_->removeChannel(this);
 }
 

@@ -7,11 +7,9 @@
 #include <string>
 
 
-// FIXME:只接收一次消息就自动断开连接
 void onMessage(const TcpConnectionPtr& conn, Buffer* buf, Timestamp receiveTime) {
     if(buf->findCRLF()) {
-        std::string msg = buf->retrieveAllAsString();
-        LOG_INFO("message: %s \n", msg.c_str());
+        conn->send("No such user\r\n");
         conn->shutdown();
     }
 }

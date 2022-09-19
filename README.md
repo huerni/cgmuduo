@@ -43,7 +43,7 @@ linux下，项目编译执行`./autobuild.sh`，测试用例进入`example/`文�
 1. 没有设置ConnectionCallback和MessageCallback，当连接时，报错bad_function_call
 > 设置defaultConnectionCallback和defaultMessageCallback，并在构建TcpServer时初始化  
 2. Epollpoller.cc:103处发生段错误，似乎是`static_cast<Channel*>`出问题
-> 可能因为在Epollpoller:update中同时设置了event.data.ptr和event.data.fd  
+> 将g++版本升级到9以上 
 3. 自定义回调函数，接收消息时报段错误
 > 将g++版本升级到9以上
 
