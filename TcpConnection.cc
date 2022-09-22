@@ -184,7 +184,7 @@ void TcpConnection::connectEstableished() {
 }
 
 // 连接销毁 
-
+// FIXME: 多线程时，客户端关闭时多次调用？？在centos上有这bug，在ubuntu上无bug
 void TcpConnection::connectDestroyed() {
     if(state_ == kConnected) {
         setState(kDisconnected);

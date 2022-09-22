@@ -49,6 +49,7 @@
         "system_error": "cpp",
         "fstream": "cpp",
         "mutex": "cpp",
-        "sstream": "cpp"
+        "sstream": "cpp",
+        "list": "cpp"
     }
 }

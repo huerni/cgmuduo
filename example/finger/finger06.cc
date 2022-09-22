@@ -7,12 +7,15 @@
 #include <string>
 #include <map>
 
+using std::string;
+
 using UserMap = std::map<string, string>;
+UserMap users;
 
 string getUser(const string& user) {
     string result = "No such user";
-    UserMap::iterator it = user.find(user);
-    if(it != user.end()) {
+    UserMap::iterator it = users.find(user);
+    if(it != users.end()) {
         result = it->second;
     }
     return result;
@@ -22,8 +25,8 @@ void onMessage(const TcpConnectionPtr& conn, Buffer* buf, Timestamp receiveTime)
     const char* crlf = buf->findCRLF();
     if(crlf) {
         string user(buf->peek(), crlf);
-        conn->send(getUser() + "\r\n");
-        buf->retrieve((size_t)crlf.size());
+        conn->send(getUser(user) + "\r\n");
+        buf->retrieve((size_t)sizeof crlf);
         conn->shutdown();
     }
 }
