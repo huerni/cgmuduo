@@ -48,6 +48,8 @@ public:
         closeCallback_ = cb;
     }
 
+    void setTcpNoDelay(bool on);
+
     void connectEstableished();
     void connectDestroyed();
     

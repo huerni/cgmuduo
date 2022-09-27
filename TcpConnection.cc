@@ -173,6 +173,10 @@ void TcpConnection::shutdownInLoop() {
     }
 }
 
+void TcpConnection::setTcpNoDelay(bool on) {
+    socket_->setTcpNoDelay(on);
+}
+
 
 // 连接建立
 void TcpConnection::connectEstableished() {
