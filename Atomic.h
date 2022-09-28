@@ -11,7 +11,7 @@ public:
 
     }
 
-    T get() { return __sync_val_compare_and_swap(&value, 0, 0); }
+    T get() { return __sync_val_compare_and_swap(&value_, 0, 0); }
 
     T getAndAdd(T x) {
         return __sync_fetch_and_add(&value_, x);

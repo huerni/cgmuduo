@@ -45,7 +45,7 @@ public:
     void removeChannel(Channel* channel);
     bool hasChannel(Channel* channel);
 
-    TimerId runEvery(double interval, TimerCallback cb);
+    //TimerId runEvery(double interval, TimerCallback cb);
 
     // 判断EventLoop对象是否在自己线程里面
     bool isInLoopThread() const { return threadId_ == CurrentThread::tid(); }

@@ -5,7 +5,7 @@ muduo是一个基于非阻塞IO和事件驱动的C++网络库，采用Reactor模
 ![jiagou](./img/jiagou.png)  
 
 ## 使用
-
+linux g++ version(9.+) c++17(因使用std::any，所以升级为17)  
 linux下，项目编译执行`./autobuild.sh`，测试用例进入`example/`文件夹，make生成测试程序  
   
 ## 类功能介绍

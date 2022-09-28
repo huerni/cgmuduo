@@ -92,18 +92,42 @@ void TcpConnection::handleWrite() {
     }
 }
 
-void TcpConnection::send(const std::string &buf) {
+void TcpConnection::send(const void* data, int len) {
+    send(std::string(static_cast<const char*>(data), len));
+}
+
+void TcpConnection::send(const std::string& data) {
     if(state_ == kConnected) {
         if(loop_->isInLoopThread()) {
-            sendInLoop(buf.c_str(), buf.size());
+            sendInLoop(data.c_str(), data.size());
         }
         else {
             loop_->runInLoop(
-                std::bind(&TcpConnection::sendInLoop, this, buf.c_str(), buf.size())
+                std::bind(&TcpConnection::sendInLoop, this, data.c_str(), data.size())
             );
         }
     }
 }
+
+void TcpConnection::send(Buffer* buf) {
+    if(state_ == kConnected) {
+        if(loop_->isInLoopThread()) {
+            sendInLoop(buf->peek(), buf->readableBytes());
+            buf->retrieveAll();
+        }
+        else {
+            std::string data = buf->retrieveAllAsString();
+            loop_->runInLoop(
+                std::bind(&TcpConnection::sendInLoop, this, data.c_str(), data.size())
+            );
+        }
+    }
+}
+
+
+//void TcpConnection::sendInLoop(const std::string& message) {
+//    sendInLoop(message.c_str(), message.size());
+//}
 
 void TcpConnection::sendInLoop(const void *message, size_t len) {
     ssize_t nwrote = 0;

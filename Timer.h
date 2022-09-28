@@ -1,6 +1,4 @@
-#pragma once;
-
-// TODO:
+#pragma once
 
 #include "Atomic.h"
 #include "Timestamp.h"

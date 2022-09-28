@@ -9,6 +9,8 @@
 #include <string>
 #include <atomic>
 
+#include <any>
+
 class Channel;
 class EventLoop;
 class Socket;
@@ -27,7 +29,10 @@ public:
 
     bool connected() const { return state_ == kConnected; }
   
-    void send(const std::string &buf);
+    void send(const std::string& data);
+    void send(const void* data, int len);
+    void send(Buffer* buf);
+
     void shutdown();
 
     void setConnectionCallback(const ConnectionCallback& cb) {
@@ -48,6 +53,14 @@ public:
         closeCallback_ = cb;
     }
 
+    void setContext(const std::any& context) {
+        context_ = context;
+    }
+
+    const std::any& getContext() const {
+        return context_;
+    }
+
     void setTcpNoDelay(bool on);
 
     void connectEstableished();
@@ -59,6 +72,7 @@ private:
     void handleClose();
     void handleError();
 
+   // void sendInLoop(const std::string& message);
     void sendInLoop(const void* message, size_t len);
     void shutdownInLoop();
 
@@ -87,4 +101,6 @@ private:
 
     Buffer inputBuffer_;
     Buffer outputBuffer_;
+
+    std::any context_;
 };

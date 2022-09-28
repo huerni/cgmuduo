@@ -50,6 +50,16 @@
         "fstream": "cpp",
         "mutex": "cpp",
         "sstream": "cpp",
-        "list": "cpp"
+        "list": "cpp",
+        "strstream": "cpp",
+        "bitset": "cpp",
+        "complex": "cpp",
+        "map": "cpp",
+        "set": "cpp",
+        "iomanip": "cpp",
+        "cfenv": "cpp",
+        "cinttypes": "cpp",
+        "typeindex": "cpp",
+        "any": "cpp"
     }
 }
