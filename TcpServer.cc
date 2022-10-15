@@ -11,14 +11,14 @@
 
 static EventLoop* CheckLoopNotNull(EventLoop* loop) {
     if(loop == nullptr) {
-        LOG_FATAL("[%s:%s:%d] mainLoop is null! \n", __FILE__, __FUNCTION__, __LINE__);
+        LOG_FATAL("mainLoop is null! - [%s:%d]", __FILE__, __LINE__);
     }
     return loop;
 }
 
 void defaultConnectionCallback(const TcpConnectionPtr& conn) {
     std::string isConnected = ((conn->connected()) ? "UP" : "DOWN");
-    LOG_INFO("%s -> %s is %s \n", conn->localAddr().toIpPort().c_str(), conn->peerAddr().toIpPort().c_str(), isConnected.c_str());
+    LOG_INFO("%s -> %s is %s", conn->localAddr().toIpPort().c_str(), conn->peerAddr().toIpPort().c_str(), isConnected.c_str());
 }
 
 void defaultMessageCallback(const TcpConnectionPtr& conn, Buffer* buf, Timestamp) {

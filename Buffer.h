@@ -67,6 +67,13 @@ public:
             makeSpace(len);
         }
     }
+    
+    // 在缓冲区的信息头部填充信息
+    void prepend(const void* data, size_t len) {
+        readerIndex_ -= len;
+        const char* d = static_cast<const char*>(data);
+        std::copy(d, d+len, begin()+readerIndex_);
+    }
 
     // 将len长度data写入缓存区
     void append(const char* data, size_t len) {
@@ -93,6 +100,7 @@ public:
     ssize_t writeFd(int fd, int* saveErrno);
 
 private:
+    // buffer的最前面
     char* begin() {
         // 解开迭代器，取地址
         return &*buffer_.begin();
@@ -119,7 +127,7 @@ private:
         }
     }
 
-    std::vector<char> buffer_;
+    std::vector<char> buffer_; 
     size_t readerIndex_;
     size_t writerIndex_;
 

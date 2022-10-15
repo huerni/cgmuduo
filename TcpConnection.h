@@ -61,6 +61,8 @@ public:
         return context_;
     }
 
+    void forceClose();
+
     void setTcpNoDelay(bool on);
 
     void connectEstableished();
@@ -71,6 +73,8 @@ private:
     void handleWrite();
     void handleClose();
     void handleError();
+
+    void forceCloseInLoop();
 
    // void sendInLoop(const std::string& message);
     void sendInLoop(const void* message, size_t len);

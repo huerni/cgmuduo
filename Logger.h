@@ -13,8 +13,9 @@
     do { \
         Logger &logger = Logger::instance(); \
         logger.setLogLevel(INFO); \
-        char buf[1024] = {0}; \
-        snprintf(buf, 1024, logmsgFormat, ##__VA_ARGS__); \
+        char buf[1088] = {0}; \
+        size_t len = snprintf(buf, 1024, logmsgFormat, ##__VA_ARGS__); \
+        snprintf(buf+len, 64, " - %s:%d", __FILE__, __LINE__); \
         logger.log(buf); \
     } while (0);
 

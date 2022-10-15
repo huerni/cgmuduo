@@ -201,6 +201,18 @@ void TcpConnection::setTcpNoDelay(bool on) {
     socket_->setTcpNoDelay(on);
 }
 
+void TcpConnection::forceClose() {
+    if(state_ == kConnected || state_ == kDisconnecting) {
+        setState(kDisconnecting);
+        loop_->queueInLoop(std::bind(&TcpConnection::forceCloseInLoop, shared_from_this()));
+    }
+}
+
+void TcpConnection::forceCloseInLoop() {
+    if(state_ == kConnected || state_ == kDisconnecting) {
+        handleClose();
+    }
+}
 
 // 连接建立
 void TcpConnection::connectEstableished() {

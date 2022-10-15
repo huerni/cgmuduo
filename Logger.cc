@@ -1,6 +1,7 @@
 #include "Logger.h"
 #include "Timestamp.h"
 #include <iostream>
+#include <unistd.h>
 
 // 单例模式，获取唯一单例对象
 // 懒汉模式
@@ -16,6 +17,10 @@ void Logger::setLogLevel(int level) {
 
 // 写日志 [级别信息] time : msg
 void Logger::log(std::string msg) {
+
+    std::cout<< Timestamp::now().toString() <<" ";
+    std::cout<< getpid() << " ";
+
     switch (logLevel_)
     {
     case INFO:
@@ -32,5 +37,5 @@ void Logger::log(std::string msg) {
         break;
     }
     
-    std::cout << Timestamp::now().toString()<< msg <<std::endl;
+    std::cout << msg <<std::endl;
 }
