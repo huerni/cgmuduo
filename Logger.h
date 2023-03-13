@@ -14,8 +14,8 @@
         Logger &logger = Logger::instance(); \
         logger.setLogLevel(INFO); \
         char buf[1088] = {0}; \
-        size_t len = snprintf(buf, 1024, logmsgFormat, ##__VA_ARGS__); \
-        snprintf(buf+len, 64, " - %s:%d", __FILE__, __LINE__); \
+        size_t len = snprintf(buf, 64, "[%s:%d] ", __FILE__, __LINE__); \
+        snprintf(buf+len, 1024, logmsgFormat, ##__VA_ARGS__); \
         logger.log(buf); \
     } while (0);
 
@@ -23,8 +23,9 @@
     do { \
         Logger &logger = Logger::instance(); \
         logger.setLogLevel(ERROR); \
-        char buf[1024] = {0}; \
-        snprintf(buf, 1024, logmsgFormat, ##__VA_ARGS__); \
+        char buf[1088] = {0}; \
+        size_t len = snprintf(buf, 64, "[%s:%d] ", __FILE__, __LINE__); \
+        snprintf(buf+len, 1024, logmsgFormat, ##__VA_ARGS__); \
         logger.log(buf); \
     } while (0);
 
@@ -32,8 +33,9 @@
     do { \
         Logger &logger = Logger::instance(); \
         logger.setLogLevel(FATAL); \
-        char buf[1024] = {0}; \
-        snprintf(buf, 1024, logmsgFormat, ##__VA_ARGS__); \
+        char buf[1088] = {0}; \
+        size_t len = snprintf(buf, 64, "[%s:%d] ", __FILE__, __LINE__); \
+        snprintf(buf+len, 1024, logmsgFormat, ##__VA_ARGS__); \
         logger.log(buf); \
         exit(-1); \
     } while (0);
